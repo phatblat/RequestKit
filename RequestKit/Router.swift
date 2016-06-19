@@ -3,8 +3,8 @@ import Foundation
 let errorDomain = "com.octokit.swift"
 
 public enum Response<T> {
-    case Success(T)
-    case Failure(ErrorType)
+    case success(T)
+    case failure(ErrorProtocol)
 }
 
 public enum HTTPMethod: String {
@@ -12,7 +12,7 @@ public enum HTTPMethod: String {
 }
 
 public enum HTTPEncoding: Int {
-    case URL, FORM, JSON
+    case url, form, json
 }
 
 public protocol Configuration {
@@ -34,64 +34,64 @@ public protocol Router {
     var params: [String: String] { get }
     var configuration: Configuration { get }
 
-    func urlQuery(parameters: [String: String]) -> String
-    func request(urlString: String, parameters: [String: String]) -> NSURLRequest?
-    func loadJSON<T>(expectedResultType: T.Type, completion: (json: T?, error: ErrorType?) -> Void)
-    func request() -> NSURLRequest?
+    func urlQuery(_ parameters: [String: String]) -> String
+    func request(_ urlString: String, parameters: [String: String]) -> URLRequest?
+    func loadJSON<T>(_ expectedResultType: T.Type, completion: (json: T?, error: ErrorProtocol?) -> Void)
+    func request() -> URLRequest?
 }
 
 public extension Router {
-    public func request() -> NSURLRequest? {
+    public func request() -> URLRequest? {
         let URLString = configuration.apiEndpoint.stringByAppendingURLPath(path)
-        var parameters = encoding == .JSON ? [:] : params
+        var parameters = encoding == .json ? [:] : params
         if let accessToken = configuration.accessToken {
             parameters[configuration.accessTokenFieldName] = accessToken
         }
         return request(URLString, parameters: parameters)
     }
 
-    public func urlQuery(parameters: [String: String]) -> String {
+    public func urlQuery(_ parameters: [String: String]) -> String {
         var components: [(String, String)] = []
-        for key in parameters.keys.sort(<) {
+        for key in parameters.keys.sorted(isOrderedBefore: <) {
             if let value = parameters[key] {
                 let encodedValue = value.urlEncodedString()
                 components.append(key, encodedValue!)
             }
         }
 
-        return components.map{"\($0)=\($1)"}.joinWithSeparator("&")
+        return components.map{"\($0)=\($1)"}.joined(separator: "&")
     }
 
-    public func request(urlString: String, parameters: [String: String]) -> NSURLRequest? {
+    public func request(_ urlString: String, parameters: [String: String]) -> URLRequest? {
         var URLString = urlString
         switch encoding {
-        case .URL, .JSON:
+        case .url, .json:
             if parameters.keys.count > 0 {
-                URLString = [URLString, urlQuery(parameters) ?? ""].joinWithSeparator("?")
+                URLString = [URLString, urlQuery(parameters) ?? ""].joined(separator: "?")
             }
-            if let URL = NSURL(string: URLString) {
-                let mutableURLRequest = NSMutableURLRequest(URL: URL)
-                mutableURLRequest.HTTPMethod = method.rawValue
-                return mutableURLRequest
+            if let URL = URL(string: URLString) {
+                let mutableURLRequest = NSMutableURLRequest(url: URL)
+                mutableURLRequest.httpMethod = method.rawValue
+                return mutableURLRequest as URLRequest
             }
-        case .FORM:
-            let queryData = urlQuery(parameters).dataUsingEncoding(NSUTF8StringEncoding)
-            if let URL = NSURL(string: URLString) {
-                let mutableURLRequest = NSMutableURLRequest(URL: URL)
+        case .form:
+            let queryData = urlQuery(parameters).data(using: String.Encoding.utf8)
+            if let URL = URL(string: URLString) {
+                let mutableURLRequest = NSMutableURLRequest(url: URL)
                 mutableURLRequest.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "content-type")
-                mutableURLRequest.HTTPBody = queryData
-                mutableURLRequest.HTTPMethod = method.rawValue
-                return mutableURLRequest
+                mutableURLRequest.httpBody = queryData
+                mutableURLRequest.httpMethod = method.rawValue
+                return mutableURLRequest as URLRequest
             }
         }
 
         return nil
     }
 
-    public func loadJSON<T>(expectedResultType: T.Type, completion: (json: T?, error: ErrorType?) -> Void) {
+    public func loadJSON<T>(_ expectedResultType: T.Type, completion: (json: T?, error: ErrorProtocol?) -> Void) {
         if let request = request() {
-            let task = NSURLSession.sharedSession().dataTaskWithRequest(request) { data, response, err in
-                if let response = response as? NSHTTPURLResponse {
+            let task = URLSession.shared().dataTask(with: request) { data, response, err in
+                if let response = response as? HTTPURLResponse {
                     if response.wasSuccessful == false {
                         let error = NSError(domain: errorDomain, code: response.statusCode, userInfo: nil)
                         completion(json: nil, error: error)
@@ -104,7 +104,7 @@ public extension Router {
                 } else {
                     if let data = data {
                         do {
-                            let JSON = try NSJSONSerialization.JSONObjectWithData(data, options: .MutableContainers) as? T
+                            let JSON = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? T
                             completion(json: JSON, error: nil)
                         } catch {
                             completion(json: nil, error: error)
@@ -117,7 +117,7 @@ public extension Router {
     }
 }
 
-public extension NSHTTPURLResponse {
+public extension HTTPURLResponse {
     public var wasSuccessful: Bool {
         let successRange = 200..<300
         return successRange.contains(statusCode)
