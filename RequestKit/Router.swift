@@ -57,7 +57,7 @@ public extension Router {
     public func urlQuery(_ parameters: [String: AnyObject]) -> [URLQueryItem]? {
         guard parameters.count > 0 else { return nil }
         var components: [URLQueryItem] = []
-        for key in parameters.keys.sorted(isOrderedBefore: <) {
+        for key in parameters.keys.sorted() {
             guard let value = parameters[key] else { continue }
             switch value {
             case let value as String:
@@ -71,7 +71,7 @@ public extension Router {
                     }
                 }
             case let valueDict as [String: AnyObject]:
-                for nestedKey in valueDict.keys.sorted(isOrderedBefore: <) {
+                for nestedKey in valueDict.keys.sorted() {
                     guard let value = valueDict[nestedKey] as? String else { continue }
                     if let escapedValue = value.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) {
                         components.append(URLQueryItem(name: "\(key)[\(nestedKey)]", value: escapedValue))
