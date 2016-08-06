@@ -2,7 +2,7 @@ import Foundation
 
 public enum Response<T> {
     case success(T)
-    case failure(ErrorProtocol)
+    case failure(Error)
 }
 
 public enum HTTPMethod: String {
@@ -39,7 +39,7 @@ public protocol Router {
 
     func urlQuery(_ parameters: [String: AnyObject]) -> [URLQueryItem]?
     func request(_ urlComponents: URLComponents, parameters: [String: AnyObject]) -> URLRequest?
-    func loadJSON<T>(_ session: RequestKitURLSession, expectedResultType: T.Type, completion: (json: T?, error: ErrorProtocol?) -> Void) -> URLSessionDataTaskProtocol?
+    func loadJSON<T>(_ session: RequestKitURLSession, expectedResultType: T.Type, completion: (json: T?, error: Error?) -> Void) -> URLSessionDataTaskProtocol?
     func request() -> URLRequest?
 }
 
@@ -105,7 +105,7 @@ public extension Router {
         }
     }
 
-    public func loadJSON<T>(_ session: RequestKitURLSession = URLSession.shared, expectedResultType: T.Type, completion: (json: T?, error: ErrorProtocol?) -> Void) -> URLSessionDataTaskProtocol? {
+    public func loadJSON<T>(_ session: RequestKitURLSession = URLSession.shared, expectedResultType: T.Type, completion: (json: T?, error: Error?) -> Void) -> URLSessionDataTaskProtocol? {
         guard let request = request() else {
             return nil
         }

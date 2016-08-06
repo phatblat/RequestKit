@@ -1,13 +1,13 @@
 import Foundation
 
 public protocol JSONPostRouter: Router {
-    func postJSON<T>(_ session: RequestKitURLSession, expectedResultType: T.Type, completion: (json: T?, error: ErrorProtocol?) -> Void) -> URLSessionDataTaskProtocol?
+    func postJSON<T>(_ session: RequestKitURLSession, expectedResultType: T.Type, completion: (json: T?, error: Error?) -> Void) -> URLSessionDataTaskProtocol?
 }
 
 public let RequestKitErrorResponseKey = "RequestKitErrorResponseKey"
 
 public extension JSONPostRouter {
-    public func postJSON<T>(_ session: RequestKitURLSession = URLSession.shared, expectedResultType: T.Type, completion: (json: T?, error: ErrorProtocol?) -> Void) -> URLSessionDataTaskProtocol? {
+    public func postJSON<T>(_ session: RequestKitURLSession = URLSession.shared, expectedResultType: T.Type, completion: (json: T?, error: Error?) -> Void) -> URLSessionDataTaskProtocol? {
         guard let request = request() else {
             return nil
         }
