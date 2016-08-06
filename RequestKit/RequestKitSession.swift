@@ -1,8 +1,8 @@
 import Foundation
 
 public protocol RequestKitURLSession {
-    func dataTaskWithRequest(_ request: URLRequest, completionHandler: (Data?, URLResponse?, NSError?) -> Void) -> URLSessionDataTaskProtocol
-    func uploadTaskWithRequest(_ request: URLRequest, fromData bodyData: Data?, completionHandler: (Data?, URLResponse?, NSError?) -> Void) -> URLSessionDataTaskProtocol
+    func dataTaskWithRequest(_ request: URLRequest, completionHandler: (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol
+    func uploadTaskWithRequest(_ request: URLRequest, fromData bodyData: Data?, completionHandler: (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol
 }
 
 public protocol URLSessionDataTaskProtocol {
@@ -12,13 +12,13 @@ public protocol URLSessionDataTaskProtocol {
 extension URLSessionDataTask: URLSessionDataTaskProtocol { }
 
 extension URLSession: RequestKitURLSession {
-    public func dataTaskWithRequest(_ request: URLRequest, completionHandler: (Data?, URLResponse?, NSError?) -> Void)
+    public func dataTaskWithRequest(_ request: URLRequest, completionHandler: (Data?, URLResponse?, Error?) -> Void)
         -> URLSessionDataTaskProtocol {
         return (dataTask(with: request, completionHandler: completionHandler)
             as URLSessionDataTask) as URLSessionDataTaskProtocol
     }
 
-    public func uploadTaskWithRequest(_ request: URLRequest, fromData bodyData: Data?, completionHandler: (Data?, URLResponse?, NSError?) -> Void) -> URLSessionDataTaskProtocol {
+    public func uploadTaskWithRequest(_ request: URLRequest, fromData bodyData: Data?, completionHandler: (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol {
         return (uploadTask(with: request, from: bodyData, completionHandler: completionHandler) as URLSessionDataTask) as URLSessionDataTaskProtocol
     }
 }
