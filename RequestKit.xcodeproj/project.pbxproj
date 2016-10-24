@@ -394,9 +394,9 @@
 					};
 					234F4C1B1BDDF64300A58EF7 = {
 						CreatedOnToolsVersion = 7.1;
-						DevelopmentTeam = 3NPZ2HXWU8;
 						DevelopmentTeamName = "Piet Brauer";
 						LastSwiftMigration = 0800;
+						ProvisioningStyle = Automatic;
 					};
 					234F4C251BDDF64300A58EF7 = {
 						CreatedOnToolsVersion = 7.1;
@@ -844,7 +844,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -859,7 +861,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
